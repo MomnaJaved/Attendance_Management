@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoleModule } from './roles/role.module';
 import { UserModule } from './user/user.module';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -18,6 +18,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
     } as TypeOrmModuleOptions),
     RoleModule,
     UserModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

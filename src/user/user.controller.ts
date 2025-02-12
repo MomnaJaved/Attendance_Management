@@ -9,14 +9,15 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { RegisterService, UserService } from './user.service';
+import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { LoginService } from './user.service';
+import { LoginUserDto } from './dto/login-user.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UsersService) {}
 
   private handleError(error: unknown, status: HttpStatus) {
     throw new HttpException(
@@ -24,12 +25,33 @@ export class UserController {
       status,
     );
   }
-
+  @Public()
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     try {
       await this.userService.create(createUserDto);
       return { success: true, message: 'User Created Successfully' };
+    } catch (error) {
+      this.handleError(error, HttpStatus.BAD_REQUEST);
+    }
+  }
+  @Public()
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    try {
+      await this.userService.register(createUserDto);
+      return { success: true, message: 'User Registered Successfully' };
+    } catch (error) {
+      this.handleError(error, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Public()
+  @Post('login')
+  async login(@Body() loginUserDto: LoginUserDto) {
+    try {
+      const data = await this.userService.login(loginUserDto);
+      return { success: true, data, message: 'Login Successful' };
     } catch (error) {
       this.handleError(error, HttpStatus.BAD_REQUEST);
     }
@@ -79,55 +101,6 @@ export class UserController {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
       return { success: true, message: 'User Deleted Successfully' };
-    } catch (error) {
-      this.handleError(error, HttpStatus.BAD_REQUEST);
-    }
-  }
-}
-
-@Controller('login')
-export class LoginController {
-  constructor(private readonly loginService: LoginService) {}
-
-  private handleError(error: unknown, status: HttpStatus) {
-    throw new HttpException(
-      error instanceof Error ? error.message : 'An unexpected error occurred',
-      status,
-    );
-  }
-
-  @Get(':id/:password')
-  async login(@Param('id') id: string, @Param('password') password: string) {
-    try {
-      const data = await this.loginService.login(id, password);
-      if (!data)
-        throw new HttpException(
-          'Login failed, User not found.',
-          HttpStatus.NOT_FOUND,
-        );
-      return { success: true, data, message: 'Login Successful.' };
-    } catch (error) {
-      this.handleError(error, HttpStatus.BAD_REQUEST);
-    }
-  }
-}
-
-@Controller('register')
-export class RegisterController {
-  constructor(private readonly registerService: RegisterService) {}
-
-  private handleError(error: unknown, status: HttpStatus) {
-    throw new HttpException(
-      error instanceof Error ? error.message : 'An unexpected error occurred',
-      status,
-    );
-  }
-
-  @Post()
-  async register(@Body() createUserDto: CreateUserDto) {
-    try {
-      await this.registerService.register(createUserDto);
-      return { success: true, message: 'User Registered Successfully' };
     } catch (error) {
       this.handleError(error, HttpStatus.BAD_REQUEST);
     }
