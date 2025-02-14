@@ -6,12 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto';
 import { UpdateUserDto } from './dto';
 import { LoginUserDto } from './dto';
-
+import { AuthGuard } from '../auth/auth.guard';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UsersService) {}
@@ -49,12 +50,14 @@ export class UserController {
     return { success: true, data, message: 'User Fetched Successfully' };
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     await this.userService.update(id, updateUserDto);
     return { success: true, message: 'User Updated Successfully' };
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.userService.remove(id);
