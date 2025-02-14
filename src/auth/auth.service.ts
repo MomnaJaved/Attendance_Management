@@ -14,7 +14,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(loginUserDto: LoginUserDto): Promise<{ access_token: string }> {
+  async logIn(loginUserDto: LoginUserDto): Promise<{ access_token: string }> {
     const { id, password } = loginUserDto;
     const user = await this.usersService.findOne(id);
 
